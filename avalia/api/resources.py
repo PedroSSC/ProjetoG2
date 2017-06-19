@@ -47,6 +47,9 @@ class EventoResource(ModelResource):
             "nome": ('exact', 'startswith',)
         }
 
+    def obj_get_list(self,bundle, **kwargs):
+        return Evento.objects.filter(administrador = bundle.request.user)
+
     def obj_create(self, bundle, **kwargs):
         usuario = bundle.request.user
         nome = bundle.data['nome']
