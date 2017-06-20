@@ -103,6 +103,14 @@ class ArtigoResource(ModelResource):
             "nome": ('exact', 'startswith',)
         }
 
+
+    def obj_get(self, bundle, **kwargs):
+        artigo = Artigo.objects.get(pk=kwargs['pk'])
+        avaliacoes = Avaliacao.objects.filter(artigo = artigo)
+        return artigo
+
+
+
     def obj_create(self, bundle, **kwargs):
         autor = bundle.request.user
         print(autor)
@@ -156,17 +164,34 @@ class AvaliacaoResource(ModelResource):
             avaliador = bundle.request.user
             artigo = bundle.data['artigo'].split("/")
             qualidade = bundle.data['qualidade']
-            inovacao = bundle.data['qualidade']
-            resultados = bundle.data['qualidade']
-            metodologia = bundle.data['qualidade']
-            adequacao = bundle.data['qualidade']
+            inovacao = bundle.data['inovacao']
+            resultados = bundle.data['resultados']
+            metodologia = bundle.data['metodologia']
+            adequacao = bundle.data['adequacao']
             contAval = Avaliacao.objects.filter(artigo = artigo[4], avaliador = avaliador)
             if(contAval.__len__() == 0):
                 avaliacao = Avaliacao()
                 avaliacao.avaliador = User.objects.get(pk=avaliador.pk)
                 avaliacao.artigo = Artigo.objects.get(pk=artigo[4])
+                avaliacao.qualidade = qualidade
+                avaliacao.inovacao = inovacao
+                avaliacao.resultados = resultados
+                avaliacao.metodologia = metodologia
+                avaliacao.adequacao = adequacao
                 avaliacao.save()
                 bundle.obj = avaliacao
+
+                avaliacoes = Avaliacao.objects.filter(artigo = artigo[4])
+                soma = 0;
+                nota = 0;
+                for i in range(avaliacoes.__len__()):
+                    soma += (avaliacoes[i].qualidade + avaliacoes[i].inovacao + avaliacoes[i].resultados + avaliacoes[i].metodologia + avaliacoes[i].adequacao)/5
+                if(soma > 0):
+                    nota = soma/avaliacoes.__len__()
+                artigoFinal = Artigo()
+                artigoFinal = Artigo.objects.get(pk=artigo[4])
+                artigoFinal.nota = nota
+                artigoFinal.save()
                 return bundle
             else:
                 raise Unauthorized('Avaliação já realizada.')

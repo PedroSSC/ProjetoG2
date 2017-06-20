@@ -15,9 +15,10 @@ class Artigo(models.Model):
     nome = models.CharField('nome',max_length=200, null = False)
     evento = models.ForeignKey('Evento',max_length=200 )
     autor = models.ForeignKey(User, null = False)
+    nota = models.FloatField('nota', null = False, default=0)
 
     def __str__(self):
-        return '{}'.format(self.nome)
+        return '{}'.format(self.nome,self.nota)
 
 
 
@@ -31,8 +32,4 @@ class Avaliacao(models.Model):
     adequacao = models.FloatField('adequacao', default=0)
 
     def __str__(self):
-        return '{}'.format(self.nome)
-
-#class ArtigoAvaliacao(models.Model):
-#    artigo = models.ForeignKey('Artigo')
-#    avaliador = models.OneToOneField(User)
+        return '{}'.format(self.artigo)
